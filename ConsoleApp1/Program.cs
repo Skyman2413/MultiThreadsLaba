@@ -3,8 +3,8 @@ using ConsoleApp1;
 
 class Program
 {
-    public static  BlockingCollection<Dictionary<string, string>> _serverQueue = new ();
-    public static Dictionary<string, string> _jobTemplate = new()
+    public static  BlockingCollection<Dictionary<string, string>> ServerQueue = new ();
+    public static Dictionary<string, string> JobTemplate = new()
     {
         {"org_name", "sample_name"},
         {"count_price", "199234"},
