@@ -63,6 +63,7 @@ public class Server
                     response.StatusCode = 400;
                     response.StatusDescription = "Bad Request";
                 }
+                Console.WriteLine($"Элемент успешно добавлен. Кол-во элементов в очереди: {Program.ServerQueue.Count}" );
                 break;
             }
             case "/current_state/":
@@ -90,6 +91,7 @@ public class Server
         void CreateNewItem()
         {
             // создание нового элемента очереди
+            Console.WriteLine("Получен запрос на создание нового элемента очереди");
             if (request.HttpMethod.ToLower() != "post")
             {
                 response.StatusCode = 405;
@@ -124,7 +126,7 @@ public class Server
                     res = readStream.ReadToEnd();
                 }
             }
-            
+            Console.WriteLine(res);
             return JsonSerializer.Deserialize<Job>(res);
         }
             
