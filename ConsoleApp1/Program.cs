@@ -15,14 +15,6 @@ class Job
 class Program
 {
     public static BlockingCollection<Job> ServerQueue = new ();
-    public static Dictionary<string, string> JobTemplate = new()
-    {
-        {"org_name", "sample_name"},
-        {"count_price", "199234"},
-        {"date", "12.04.2023"},
-        {"product_list", "productA, productB"},
-        {"state", "in_progress"}
-    };
     private static void worker()
     {
 
