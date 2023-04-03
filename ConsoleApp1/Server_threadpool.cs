@@ -63,7 +63,6 @@ public class Server
                     response.StatusCode = 400;
                     response.StatusDescription = "Bad Request";
                 }
-
                 break;
             }
             case "/current_state/":
@@ -85,6 +84,7 @@ public class Server
         {
             output.Write(buffer);
         }
+        response.Close();
         
 
         void CreateNewItem()
