@@ -53,6 +53,22 @@ public class Server
         {
             case "/new_item/":
             {
+                Console.WriteLine("Получен запрос на создание нового элемента очереди");
+
+                if (request.HttpMethod.ToLower() != "post")
+                {
+                    response.StatusCode = 405;
+                    response.StatusDescription = "Method is not allowed";
+                    break;
+                }
+
+                if (request.ContentType is not ("application/json" or "text/json"))
+                {
+                    response.StatusCode = 415;
+                    response.StatusDescription = "Unsupported Media Type";
+                    break;
+                }
+
                 // для создания новой задачи
                 try
                 {
@@ -64,11 +80,33 @@ public class Server
                     response.StatusDescription = "Bad Request";
                 }
                 Console.WriteLine($"Элемент успешно добавлен. Кол-во элементов в очереди: {Program.ServerQueue.Count}" );
+                var buffer = Encoding.UTF8.GetBytes(responseData);
+                // получаем поток ответа и пишем в него ответ
+                response.ContentLength64 = buffer.Length;
+                using (var output = response.OutputStream)
+                {
+                    output.Write(buffer);
+                }
                 break;
             }
             case "/current_state/":
             {
-                //TODO для получения данных об очереди
+                Console.WriteLine("Получен запрос на получение инфо");
+                
+                if (request.HttpMethod.ToLower() != "get")
+                {
+                    response.StatusCode = 405;
+                    response.StatusDescription = "Method is not allowed";
+                    break;
+                }
+                var queueData = Program.ServerQueue.ToArray();
+                var buffer = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(queueData));
+                // получаем поток ответа и пишем в него ответ
+                response.ContentLength64 = buffer.Length;
+                using (var output = response.OutputStream)
+                {
+                    output.Write(buffer);
+                }
                 break;
             }
             default:
@@ -78,35 +116,15 @@ public class Server
             }
         }
 
-        byte[] buffer = Encoding.UTF8.GetBytes(responseData);
-        // получаем поток ответа и пишем в него ответ
-        response.ContentLength64 = buffer.Length;
-        using (var output = response.OutputStream)
-        {
-            output.Write(buffer);
-        }
+        
         response.Close();
         
 
         void CreateNewItem()
         {
             // создание нового элемента очереди
-            Console.WriteLine("Получен запрос на создание нового элемента очереди");
-            if (request.HttpMethod.ToLower() != "post")
-            {
-                response.StatusCode = 405;
-                response.StatusDescription = "Method is not allowed";
-                return;
-            }
-
-            if (request.ContentType is not ("application/json" or "text/json"))
-            {
-                response.StatusCode = 415;
-                response.StatusDescription = "Unsupported Media Type";
-                return;
-            }
-
-            var job = GetDataFromRequest();
+           
+            var job = GetJobFromRequest();
             if (job is not null) Program.ServerQueue.Add(job);
             else
             {
@@ -115,7 +133,7 @@ public class Server
             }
         }
 
-        Job? GetDataFromRequest()
+        Job? GetJobFromRequest()
         {
             // преобразовываем инфо из запроса в Job-объект
             var res = "";
@@ -127,7 +145,9 @@ public class Server
                 }
             }
             Console.WriteLine(res);
-            return JsonSerializer.Deserialize<Job>(res);
+            var job = JsonSerializer.Deserialize<Job>(res);
+            job.State = "New";
+            return job;
         }
             
     
