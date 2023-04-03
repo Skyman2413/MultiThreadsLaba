@@ -9,6 +9,7 @@ class Job
     public string Date { get; set; }
     public List<string>? ProductList { get; set; }
     public string State { get; set; }
+    public string WorkerInfo { get; set; }
     
 }
 class Program
